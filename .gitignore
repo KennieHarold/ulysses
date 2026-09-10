@@ -1,9 +1,21 @@
+# Dependencies
 node_modules/
-dist/
+
+# Secrets — never commit these
 .env
-.env.*
+*.env
 !.env.example
-*.log
-.DS_Store
-.vite/
+
+# Build output
+dist/
 *.tsbuildinfo
+
+# CRE build artifacts
+*.wasm
+*.wasm.br
+
+# macOS
+.DS_Store
+
+# CRE compiler scratch file
+.cre_build_tmp.js
