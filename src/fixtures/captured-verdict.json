@@ -1,8 +1,8 @@
 {
-	"severity": "MEDIUM",
-	"lossAmount": "30000000000000000000",
+	"severity": "HIGH",
+	"lossAmount": "140000000000000000",
 	"targetFunction": "withdraw()",
-	"exploitHash": "0xb0e31374f71f4e34784b485ee4fb05dde8cb07c4e1bc4b1bdf48f16f779db839",
-	"target": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+	"exploitHash": "0x4a09f804e28d33fdaccd28e4fa9ff51d5cd67180f45486284bba5899d6ba1512",
+	"target": "0x29E37613FEc6D6e0652D071D5D74506ca3341966",
 	"network": "eth-sepolia"
 }

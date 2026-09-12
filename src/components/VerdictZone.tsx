@@ -69,8 +69,8 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 							lineHeight: 1.4,
 						}}
 					>
-						<b>Simulation unavailable.</b> The verdict below is not a confirmed result — the
-						enclave could not run the simulation: {verdict.error}
+						<b>Simulation unavailable.</b> The verdict below is not a confirmed result — the enclave
+						could not run the simulation: {verdict.error}
 					</div>
 				)}
 
