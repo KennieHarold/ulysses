@@ -1,0 +1,6 @@
+{
+	"severity": "MEDIUM",
+	"lossAmount": "30000000000000000000",
+	"targetFunction": "withdraw()",
+	"exploitHash": "0xb0e31374f71f4e34784b485ee4fb05dde8cb07c4e1bc4b1bdf48f16f779db839"
+}
