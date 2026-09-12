@@ -1,0 +1,5 @@
+# `bun test` in this repo runs only the CRE workflow package (bun:test).
+# The web UI is tested with vitest (`pnpm test`) and the contracts with
+# Hardhat (`cd contracts && pnpm test`) — neither runs under `bun test`.
+[test]
+root = "cre/exploit-verifier"

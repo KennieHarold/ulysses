@@ -44,4 +44,22 @@ describe('VerdictZone', () => {
 		const lossValue = container.querySelector('.vfield .vvalue') as HTMLElement
 		expect(lossValue.textContent).toBe('0 ETH')
 	})
+
+	it('shows the target contract and network when the verdict carries them', () => {
+		const withTarget: Verdict = {
+			...CRITICAL,
+			target: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+			network: 'eth-sepolia',
+		}
+		render(<VerdictZone verdict={withTarget} source="test" />)
+		expect(screen.getByText('target contract')).toBeInTheDocument()
+		expect(screen.getByText('replayed on eth-sepolia')).toBeInTheDocument()
+		expect(screen.getByTitle(withTarget.target as string)).toBeInTheDocument()
+	})
+
+	it('omits the target field and uses a generic fork label when absent', () => {
+		render(<VerdictZone verdict={CRITICAL} source="test" />)
+		expect(screen.queryByText('target contract')).not.toBeInTheDocument()
+		expect(screen.getByText('replayed on a fork')).toBeInTheDocument()
+	})
 })

@@ -64,8 +64,19 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 					<div className="vfield">
 						<div className="vlabel">target function</div>
 						<div className="vvalue">{verdict.targetFunction}</div>
-						<div className="vsecond">simulated against a mainnet fork</div>
+						<div className="vsecond">
+							{verdict.network ? `replayed on ${verdict.network}` : 'replayed on a fork'}
+						</div>
 					</div>
+					{verdict.target && (
+						<div className="vfield" style={{ gridColumn: '1 / -1' }}>
+							<div className="vlabel">target contract</div>
+							<div className="vvalue hash-value">
+								<span title={verdict.target}>{truncateHash(verdict.target, 14, 12)}</span>
+							</div>
+							<div className="vsecond">the address the decrypted exploit was simulated against</div>
+						</div>
+					)}
 					<div className="vfield" style={{ gridColumn: '1 / -1' }}>
 						<div className="vlabel">exploit hash · keccak256(calldata)</div>
 						<div className="vvalue hash-value">

@@ -1,4 +1,10 @@
-export { sealExploit, openExploit } from '../../cre/exploit-verifier/sealed-box'
+export {
+	sealExploit,
+	openExploit,
+	sealExploitRequest,
+	openExploitRequest,
+} from '../../cre/exploit-verifier/sealed-box'
+export type { ExploitRequest } from '../../cre/exploit-verifier/sealed-box'
 
 const VERSION = 0x01
 const EPK_LEN = 32

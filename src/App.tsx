@@ -1,11 +1,16 @@
 import { useCallback, useState } from 'react'
-import { SubmitZone } from './components/SubmitZone'
+import { SubmitZone, type ExploitForm } from './components/SubmitZone'
 import { WireZone } from './components/WireZone'
 import { VerdictZone } from './components/VerdictZone'
 import { StatusBar, type Status } from './components/StatusBar'
 import { config } from './lib/config'
 import { devLog } from './lib/devlog'
-import { describeEnvelope, sealExploit, type EnvelopeParts } from './lib/seal'
+import {
+	describeEnvelope,
+	sealExploitRequest,
+	type EnvelopeParts,
+	type ExploitRequest,
+} from './lib/seal'
 import { triggerLive } from './lib/trigger'
 import { parseVerdict, type Verdict } from './lib/verdict'
 import capturedVerdict from './fixtures/captured-verdict.json'
@@ -13,12 +18,23 @@ import capturedVerdict from './fixtures/captured-verdict.json'
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 export default function App() {
-	const [calldata, setCalldata] = useState(config.demoCalldata)
+	const [form, setForm] = useState<ExploitForm>({
+		to: config.demoTarget,
+		network: config.demoNetwork,
+		token: config.demoToken,
+		from: '',
+		value: '0',
+		calldata: config.demoCalldata,
+	})
 	const [status, setStatus] = useState<Status>('idle')
 	const [ciphertext, setCiphertext] = useState<string | null>(null)
 	const [envelope, setEnvelope] = useState<EnvelopeParts | null>(null)
 	const [verdict, setVerdict] = useState<Verdict | null>(null)
 	const [error, setError] = useState<string | null>(null)
+
+	const updateForm = useCallback((patch: Partial<ExploitForm>) => {
+		setForm((f) => ({ ...f, ...patch }))
+	}, [])
 
 	const busy = status === 'encrypting' || status === 'triggering' || status === 'awaiting'
 	const verdictSource = config.liveMode ? 'live workflow' : 'captured run (fixture)'
@@ -32,8 +48,17 @@ export default function App() {
 
 		let sealed: string
 		try {
-			if (import.meta.env.DEV) devLog('sealing plaintext calldata', calldata)
-			sealed = sealExploit(calldata.trim(), config.enclavePublicKey)
+			const request: ExploitRequest = {
+				to: form.to.trim(),
+				network: form.network.trim(),
+				calldata: form.calldata.trim(),
+			}
+			if (form.from.trim()) request.from = form.from.trim()
+			if (form.value.trim()) request.value = form.value.trim()
+			if (form.token.trim()) request.token = form.token.trim()
+
+			if (import.meta.env.DEV) devLog('sealing exploit request', request)
+			sealed = sealExploitRequest(request, config.enclavePublicKey)
 			setCiphertext(sealed)
 			setEnvelope(describeEnvelope(sealed))
 			if (import.meta.env.DEV) devLog('sealed envelope', sealed)
@@ -41,7 +66,7 @@ export default function App() {
 			setStatus('error')
 			setError(
 				`Encryption failed: ${err instanceof Error ? err.message : String(err)}. ` +
-					'Check that the calldata is valid hex and the enclave public key is 32 bytes.',
+					'Check that the addresses and calldata are valid hex and the enclave public key is 32 bytes.',
 			)
 			return
 		}
@@ -68,7 +93,7 @@ export default function App() {
 			setStatus('error')
 			setError(err instanceof Error ? err.message : String(err))
 		}
-	}, [calldata])
+	}, [form])
 
 	return (
 		<div className="app">
@@ -99,8 +124,8 @@ export default function App() {
 			)}
 
 			<SubmitZone
-				calldata={calldata}
-				onCalldata={setCalldata}
+				form={form}
+				onChange={updateForm}
 				enclavePublicKey={config.enclavePublicKey}
 				onSubmit={handleSubmit}
 				busy={busy}

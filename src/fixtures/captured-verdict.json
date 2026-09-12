@@ -2,5 +2,7 @@
 	"severity": "MEDIUM",
 	"lossAmount": "30000000000000000000",
 	"targetFunction": "withdraw()",
-	"exploitHash": "0xb0e31374f71f4e34784b485ee4fb05dde8cb07c4e1bc4b1bdf48f16f779db839"
+	"exploitHash": "0xb0e31374f71f4e34784b485ee4fb05dde8cb07c4e1bc4b1bdf48f16f779db839",
+	"target": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+	"network": "eth-sepolia"
 }
