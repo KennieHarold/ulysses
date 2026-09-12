@@ -1,0 +1,135 @@
+import { createHash } from 'node:crypto'
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import { privateKeyToAccount } from 'viem/accounts'
+import type { Connect, Plugin } from 'vite'
+
+const PROXY_PATH = '/api/trigger'
+
+const base64url = (input: Buffer | string): string => Buffer.from(input).toString('base64url')
+
+const canonicalJson = (value: unknown): string => {
+	if (Array.isArray(value)) {
+		return `[${value.map(canonicalJson).join(',')}]`
+	}
+	if (value && typeof value === 'object') {
+		const keys = Object.keys(value as Record<string, unknown>).sort()
+		return `{${keys
+			.map((k) => `${JSON.stringify(k)}:${canonicalJson((value as Record<string, unknown>)[k])}`)
+			.join(',')}}`
+	}
+	return JSON.stringify(value)
+}
+
+const readBody = (req: IncomingMessage): Promise<string> =>
+	new Promise((resolve, reject) => {
+		let data = ''
+		req.on('data', (chunk) => {
+			data += chunk
+			if (data.length > 1_000_000) reject(new Error('request body too large'))
+		})
+		req.on('end', () => resolve(data))
+		req.on('error', reject)
+	})
+
+const sendJson = (res: ServerResponse, status: number, body: unknown): void => {
+	res.statusCode = status
+	res.setHeader('Content-Type', 'application/json')
+	res.end(JSON.stringify(body))
+}
+
+const signCreJwt = async (
+	requestBody: unknown,
+	signerPrivateKey: `0x${string}`,
+): Promise<string> => {
+	const account = privateKeyToAccount(signerPrivateKey)
+
+	const digest = `0x${createHash('sha256').update(canonicalJson(requestBody), 'utf8').digest('hex')}`
+
+	const now = Math.floor(Date.now() / 1000)
+	const header = { alg: 'ETH', typ: 'JWT' }
+	const payload = {
+		digest,
+		iss: account.address,
+		iat: now,
+		exp: now + 300,
+		jti: crypto.randomUUID(),
+	}
+
+	const message = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(payload))}`
+	const signatureHex = await account.signMessage({ message })
+	const signature = base64url(Buffer.from(signatureHex.slice(2), 'hex'))
+
+	return `${message}.${signature}`
+}
+
+export const creTriggerPlugin = (env: Record<string, string>): Plugin => {
+	const gatewayUrl = env.CRE_GATEWAY_URL
+	const workflowId = env.CRE_WORKFLOW_ID
+	const signerKey = env.CRE_SIGNER_PRIVATE_KEY as `0x${string}` | undefined
+
+	const handler: Connect.NextHandleFunction = async (req, res, next) => {
+		if (!req.url || !req.url.startsWith(PROXY_PATH)) return next()
+		if (req.method !== 'POST') {
+			return sendJson(res, 405, { error: 'method not allowed; use POST' })
+		}
+
+		if (!gatewayUrl || !workflowId || !signerKey) {
+			return sendJson(res, 501, {
+				error: 'live trigger proxy not configured',
+				detail:
+					'Set CRE_GATEWAY_URL, CRE_WORKFLOW_ID and CRE_SIGNER_PRIVATE_KEY in .env ' +
+					'(server-side, non-VITE_) to enable live mode.',
+			})
+		}
+
+		try {
+			const raw = await readBody(req)
+			const incoming = raw ? (JSON.parse(raw) as Record<string, unknown>) : {}
+			if (typeof incoming.exploitCiphertext !== 'string') {
+				return sendJson(res, 400, { error: 'body must include a string "exploitCiphertext"' })
+			}
+
+			const rpcBody = {
+				id: crypto.randomUUID(),
+				jsonrpc: '2.0',
+				method: 'workflows.execute',
+				params: {
+					input: { exploitCiphertext: incoming.exploitCiphertext },
+					workflow: { workflowID: workflowId },
+				},
+			}
+
+			const token = await signCreJwt(rpcBody, signerKey)
+
+			const upstream = await fetch(gatewayUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(rpcBody),
+			})
+
+			const text = await upstream.text()
+			res.statusCode = upstream.status
+			res.setHeader('Content-Type', upstream.headers.get('content-type') ?? 'application/json')
+			res.end(text)
+		} catch (err) {
+			sendJson(res, 502, {
+				error: 'trigger proxy failed',
+				detail: err instanceof Error ? err.message : String(err),
+			})
+		}
+	}
+
+	return {
+		name: 'cre-trigger-proxy',
+		apply: 'serve',
+		configureServer(server) {
+			server.middlewares.use(handler)
+		},
+		configurePreviewServer(server) {
+			server.middlewares.use(handler)
+		},
+	}
+}
