@@ -2,3 +2,9 @@
 node_modules/
 artifacts/
 cache/
+
+# Secrets
+.env
+
+# Ignition deployment state (per-chain artifacts + journal)
+ignition/deployments/

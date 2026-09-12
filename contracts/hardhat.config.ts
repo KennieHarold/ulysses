@@ -1,10 +1,25 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-ethers";
+import "@nomicfoundation/hardhat-ignition-ethers";
+import * as dotenv from "dotenv";
+
+dotenv.config();
+
+const SEPOLIA_RPC_URL =
+  process.env.SEPOLIA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
   solidity: "0.8.28",
   paths: {
     sources: "./src",
+  },
+  networks: {
+    sepolia: {
+      url: SEPOLIA_RPC_URL,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      chainId: 11155111,
+    },
   },
 };
 

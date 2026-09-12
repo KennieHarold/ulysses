@@ -4,14 +4,21 @@
   "private": true,
   "description": "Vulnerable vault and reentrancy exploit (Hardhat + TypeScript)",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy:vault:sepolia": "hardhat ignition deploy ignition/modules/VulnerableVault.ts --network sepolia",
+    "deploy:exploit:sepolia": "hardhat ignition deploy ignition/modules/Exploit.ts --network sepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-ignition": "^0.15.16",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.17",
+    "@nomicfoundation/ignition-core": "^0.15.15",
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.20.2",
     "chai": "^4.5.0",
+    "dotenv": "^17.4.2",
     "ethers": "^6.13.4",
     "hardhat": "^2.22.17",
     "ts-node": "^10.9.2",
