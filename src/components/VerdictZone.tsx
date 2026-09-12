@@ -55,6 +55,25 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 					</div>
 				</div>
 
+				{verdict.error && (
+					<div
+						className="verdict-error"
+						role="alert"
+						style={{
+							margin: '0 0 14px',
+							padding: '10px 12px',
+							borderRadius: 8,
+							border: '1px solid var(--warn, #b8860b)',
+							background: 'rgba(184, 134, 11, 0.08)',
+							fontSize: 13,
+							lineHeight: 1.4,
+						}}
+					>
+						<b>Simulation unavailable.</b> The verdict below is not a confirmed result — the
+						enclave could not run the simulation: {verdict.error}
+					</div>
+				)}
+
 				<div className="verdict-grid">
 					<div className="vfield">
 						<div className="vlabel">vault loss</div>

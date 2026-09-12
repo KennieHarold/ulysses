@@ -7,6 +7,7 @@ export interface Verdict {
 	exploitHash: string
 	target?: string
 	network?: string
+	error?: string
 }
 
 const SEVERITIES: readonly Severity[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'NONE']
@@ -38,6 +39,7 @@ export const parseVerdict = (value: unknown): Verdict | null => {
 				exploitHash: o.exploitHash,
 				...(typeof o.target === 'string' ? { target: o.target } : {}),
 				...(typeof o.network === 'string' ? { network: o.network } : {}),
+				...(typeof o.error === 'string' ? { error: o.error } : {}),
 			}
 		}
 	}
