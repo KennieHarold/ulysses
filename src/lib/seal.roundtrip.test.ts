@@ -59,7 +59,7 @@ describe('shared seal module: the target travels inside the sealed request', () 
 		expect(openExploitRequest(sealed, ENCLAVE_PRIV)).toEqual(request)
 	})
 
-	it('keeps the target contract/chain confidential — not present in the envelope bytes', () => {
+	it('keeps the target contract/chain confidential, not present in the envelope bytes', () => {
 		const sealed = sealExploitRequest(request, ENCLAVE_PUB)
 		expect(sealed.toLowerCase()).not.toContain(request.to.slice(2).toLowerCase())
 		expect(sealed).not.toContain('sepolia')

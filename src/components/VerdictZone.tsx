@@ -43,7 +43,7 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 			<span className="zone-num">03 / verdict</span>
 			<h2 id="verdict-h">Verdict</h2>
 			<p className="sub">
-				The only value the enclave lets back out — computed on the decrypted exploit.
+				The only value the enclave lets back out, computed on the decrypted exploit.
 			</p>
 
 			<div className="verdict-card">
@@ -69,7 +69,7 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 							lineHeight: 1.4,
 						}}
 					>
-						<b>Simulation unavailable.</b> The verdict below is not a confirmed result — the enclave
+						<b>Simulation unavailable.</b> The verdict below is not a confirmed result; the enclave
 						could not run the simulation: {verdict.error}
 					</div>
 				)}
@@ -111,7 +111,7 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 						🔐
 					</span>
 					<span>
-						Computed inside the TEE — the exploit was never read outside it. Loss{' '}
+						Computed inside the TEE; the exploit was never read outside it. Loss{' '}
 						<b>{weiToEth(verdict.lossAmount)} ETH</b> measured by replaying the decrypted calldata
 						on a fork. <span style={{ color: 'var(--muted-2)' }}>verdict source: {source}</span>
 					</span>

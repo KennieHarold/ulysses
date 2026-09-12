@@ -26,7 +26,7 @@ export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }:
 		<h2 id="submit-h">Exploit request</h2>
 		<p className="sub">
 			Name the target contract and chain, then paste the raw exploit calldata. The whole request is
-			encrypted <b>in your browser</b> to the enclave's public key before anything leaves this page —
+			encrypted <b>in your browser</b> to the enclave's public key before anything leaves this page;
 			the plaintext never touches the network.
 		</p>
 

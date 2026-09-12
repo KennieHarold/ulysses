@@ -99,7 +99,7 @@ export default function App() {
 		<div className="app">
 			<header className="header">
 				<span className={`mode-badge ${config.liveMode ? 'live' : 'fixture'}`}>
-					{config.liveMode ? '● LIVE — deployed workflow' : '● FIXTURE — captured verdict'}
+					{config.liveMode ? '● LIVE: deployed workflow' : '● FIXTURE: captured verdict'}
 				</span>
 				<span className="eyebrow">🔐 Chainlink CRE · Confidential Workflow</span>
 				<h1>
@@ -107,7 +107,7 @@ export default function App() {
 				</h1>
 				<p className="lede">
 					Encrypt an exploit in your browser, hand the ciphertext to a TEE workflow, and get back
-					only a verdict — severity and vault loss. The payload is decrypted, replayed, and scored
+					only a verdict: severity and vault loss. The payload is decrypted, replayed, and scored
 					entirely inside the enclave. Node operators relay bytes they can never open.
 				</p>
 			</header>

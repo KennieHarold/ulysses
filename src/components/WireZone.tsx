@@ -13,7 +13,7 @@ export const WireZone = ({ ciphertext, envelope }: Props) => (
 		<h2 id="wire-h">Ciphertext on the wire</h2>
 		<p className="sub">
 			This opaque blob is exactly what travels to the DON and runs past every node operator. It is
-			unreadable outside the enclave — no private key here, no plaintext, nothing to steal.
+			unreadable outside the enclave: no private key here, no plaintext, nothing to steal.
 		</p>
 
 		{ciphertext ? (
@@ -61,7 +61,7 @@ export const WireZone = ({ ciphertext, envelope }: Props) => (
 					</>
 				)}
 				<div className="readback">
-					<b>Read attempt outside the enclave:</b> ✕ decryption requires the enclave-held X25519
+					<b>Read attempt outside the enclave:</b> 🔒 decryption requires the enclave-held X25519
 					private key. Operators can relay these bytes but can never open them.
 				</div>
 			</>

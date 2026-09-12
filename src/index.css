@@ -396,14 +396,14 @@ button.primary:disabled {
 	margin-top: 14px;
 	padding: 11px 14px;
 	border-radius: 8px;
-	background: rgba(255, 77, 79, 0.06);
-	border: 1px solid rgba(255, 77, 79, 0.22);
-	color: #ffb3b3;
+	background: rgba(52, 211, 153, 0.07);
+	border: 1px solid rgba(52, 211, 153, 0.24);
+	color: #9be8c8;
 	font-size: 12.5px;
 	line-height: 1.5;
 }
 .readback b {
-	color: #ff7b7d;
+	color: #34d399;
 }
 
 .zone.verdict {
