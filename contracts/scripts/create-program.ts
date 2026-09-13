@@ -50,13 +50,13 @@ async function main(): Promise<void> {
 
   const rewards = [
     0n,
-    ethers.parseEther(process.env.REWARD_LOW ?? "0.1"),
-    ethers.parseEther(process.env.REWARD_MEDIUM ?? "0.5"),
-    ethers.parseEther(process.env.REWARD_HIGH ?? "2"),
-    ethers.parseEther(process.env.REWARD_CRITICAL ?? "10"),
+    ethers.parseEther(process.env.REWARD_LOW ?? "0.001"),
+    ethers.parseEther(process.env.REWARD_MEDIUM ?? "0.01"),
+    ethers.parseEther(process.env.REWARD_HIGH ?? "0.1"),
+    ethers.parseEther(process.env.REWARD_CRITICAL ?? "1"),
   ] as const;
 
-  const fundingEth = process.env.FUNDING_ETH ?? "12";
+  const fundingEth = process.env.FUNDING_ETH ?? "0.15";
   const funding = ethers.parseEther(fundingEth);
 
   const escrow = await ethers.getContractAt("BountyEscrow", escrowAddress, signer);
