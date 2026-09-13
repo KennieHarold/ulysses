@@ -1,4 +1,6 @@
 import { truncateHash } from '../lib/format'
+import { Icon } from './Icon'
+import { markOf } from '../lib/pipeline'
 
 export interface ExploitForm {
 	to: string
@@ -17,23 +19,26 @@ interface Props {
 	busy: boolean
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const canSubmit = (f: ExploitForm): boolean =>
 	f.to.trim().length > 0 && f.network.trim().length > 0 && f.calldata.trim().length > 0
 
 export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }: Props) => (
-	<section className="zone" aria-labelledby="submit-h">
-		<span className="zone-num">01 / submit</span>
-		<h2 id="submit-h">Exploit request</h2>
+	<section className="clause" aria-labelledby="submit-h">
+		<div className="clause-head">
+			<span className="clause-mark">{markOf('Seal')}</span>
+			<h2 id="submit-h">Seal</h2>
+		</div>
 		<p className="sub">
-			Name the target contract and chain, then paste the raw exploit calldata. The whole request is
-			encrypted <b>in your browser</b> to the enclave's public key before anything leaves this page;
-			the plaintext never touches the network.
+			Name the contract you can drain and paste the calldata that drains it. Everything below is
+			sealed <b>in this browser</b>, to the enclave's public key, before a single byte leaves the
+			page. Nobody downstream can open it, and that is the whole point.
 		</p>
 
-		<div className="target-grid">
-			<div>
+		<div className="field-grid">
+			<div className="field">
 				<label className="field-label" htmlFor="to">
-					target contract (to)
+					target contract
 				</label>
 				<input
 					id="to"
@@ -44,7 +49,7 @@ export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }:
 					placeholder="0x…"
 				/>
 			</div>
-			<div>
+			<div className="field">
 				<label className="field-label" htmlFor="network">
 					network
 				</label>
@@ -57,9 +62,9 @@ export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }:
 					placeholder="eth-sepolia"
 				/>
 			</div>
-			<div>
+			<div className="field">
 				<label className="field-label" htmlFor="token">
-					token (loss measured in)
+					token the loss is measured in
 				</label>
 				<input
 					id="token"
@@ -67,12 +72,12 @@ export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }:
 					spellCheck={false}
 					value={form.token}
 					onChange={(e) => onChange({ token: e.target.value })}
-					placeholder="native or 0x… ERC20"
+					placeholder="native, or an 0x… ERC-20"
 				/>
 			</div>
-			<div>
+			<div className="field">
 				<label className="field-label" htmlFor="from">
-					sender (from · optional)
+					sender (optional)
 				</label>
 				<input
 					id="from"
@@ -80,12 +85,12 @@ export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }:
 					spellCheck={false}
 					value={form.from}
 					onChange={(e) => onChange({ from: e.target.value })}
-					placeholder="0x… (default 0x00…00)"
+					placeholder="0x… (defaults to 0x00…00)"
 				/>
 			</div>
-			<div>
+			<div className="field">
 				<label className="field-label" htmlFor="value">
-					value wei (optional)
+					value in wei (optional)
 				</label>
 				<input
 					id="value"
@@ -98,34 +103,44 @@ export const SubmitZone = ({ form, onChange, enclavePublicKey, onSubmit, busy }:
 			</div>
 		</div>
 
-		<label className="field-label" htmlFor="calldata" style={{ marginTop: 16 }}>
-			plaintext calldata (hex)
-		</label>
-		<textarea
-			id="calldata"
-			className="calldata"
-			spellCheck={false}
-			value={form.calldata}
-			onChange={(e) => onChange({ calldata: e.target.value })}
-			placeholder="0x…"
-		/>
+		<div className="field-wide">
+			<label className="field-label" htmlFor="calldata">
+				exploit calldata, plaintext hex
+			</label>
+			<textarea
+				id="calldata"
+				className="calldata"
+				spellCheck={false}
+				value={form.calldata}
+				onChange={(e) => onChange({ calldata: e.target.value })}
+				placeholder="0x…"
+			/>
+		</div>
 
 		<div className="pubkey-row">
-			<span className="lock" aria-hidden>
-				🔒
-			</span>
+			<Icon name="key" size={17} className="mark" />
 			<span className="k">
-				encrypting target + calldata to enclave pubkey{' '}
-				<b title={enclavePublicKey}>{truncateHash(enclavePublicKey, 12, 10)}</b> · X25519 ·
-				read-only
+				Sealed to enclave key <b title={enclavePublicKey}>{truncateHash(enclavePublicKey, 12, 10)}</b>{' '}
+				using X25519 key agreement. The enclave holds the only private half, and it is read-only: it
+				can open your request but never re-publish it.
 			</span>
 		</div>
 
 		<div className="actions">
 			<button className="primary" onClick={onSubmit} disabled={busy || !canSubmit(form)}>
-				{busy ? 'Working…' : 'Submit exploit'}
+				{busy ? (
+					<>
+						<Icon name="spinner" size={14} strokeWidth={2} className="spin" />
+						Working…
+					</>
+				) : (
+					<>
+						<Icon name="lock" size={14} />
+						Submit exploit
+					</>
+				)}
 			</button>
-			<span className="hint">seal → trigger → verdict</span>
+			<span className="hint">Seal it, relay it, and wait for the verdict.</span>
 		</div>
 	</section>
 )

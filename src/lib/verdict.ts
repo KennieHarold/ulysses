@@ -8,12 +8,17 @@ export interface Verdict {
 	target?: string
 	network?: string
 	error?: string
+	researcher?: string
+	programId?: string
+	signature?: string
 }
 
 const SEVERITIES: readonly Severity[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'NONE']
 
 const isSeverity = (v: unknown): v is Severity =>
 	typeof v === 'string' && (SEVERITIES as readonly string[]).includes(v)
+
+const optStr = (v: unknown): string | undefined => (typeof v === 'string' ? v : undefined)
 
 export const parseVerdict = (value: unknown): Verdict | null => {
 	const candidates: unknown[] = []
@@ -37,14 +42,25 @@ export const parseVerdict = (value: unknown): Verdict | null => {
 				lossAmount: String(o.lossAmount ?? '0'),
 				targetFunction: typeof o.targetFunction === 'string' ? o.targetFunction : 'unknown',
 				exploitHash: o.exploitHash,
-				...(typeof o.target === 'string' ? { target: o.target } : {}),
-				...(typeof o.network === 'string' ? { network: o.network } : {}),
-				...(typeof o.error === 'string' ? { error: o.error } : {}),
+				...(optStr(o.target) ? { target: optStr(o.target) } : {}),
+				...(optStr(o.network) ? { network: optStr(o.network) } : {}),
+				...(optStr(o.error) ? { error: optStr(o.error) } : {}),
+				...(optStr(o.researcher) ? { researcher: optStr(o.researcher) } : {}),
+				...(optStr(o.programId) ? { programId: optStr(o.programId) } : {}),
+				...(optStr(o.signature) ? { signature: optStr(o.signature) } : {}),
 			}
 		}
 	}
 	return null
 }
+
+export const isClaimable = (verdict: Verdict): boolean =>
+	verdict.severity !== 'NONE' &&
+	!verdict.error &&
+	!!verdict.signature &&
+	!!verdict.researcher &&
+	verdict.programId !== undefined &&
+	!!verdict.target
 
 export const parseExecutionAck = (
 	value: unknown,

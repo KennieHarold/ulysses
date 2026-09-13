@@ -1,5 +1,7 @@
 import type { EnvelopeParts } from '../lib/seal'
 import { truncateHash } from '../lib/format'
+import { Icon } from './Icon'
+import { markOf } from '../lib/pipeline'
 
 interface Props {
 	ciphertext: string | null
@@ -7,33 +9,43 @@ interface Props {
 }
 
 export const WireZone = ({ ciphertext, envelope }: Props) => (
-	<section className="zone wire" aria-labelledby="wire-h">
-		<span className="zone-num">02 / wire</span>
-		<span className="wire-tag">🛰 what the network &amp; node operators see</span>
-		<h2 id="wire-h">Ciphertext on the wire</h2>
+	<section className="clause" aria-labelledby="wire-h">
+		<div className="clause-head">
+			<span className="clause-mark">{markOf('Relay')}</span>
+			<h2 id="wire-h">Relay</h2>
+		</div>
 		<p className="sub">
-			This opaque blob is exactly what travels to the DON and runs past every node operator. It is
-			unreadable outside the enclave: no private key here, no plaintext, nothing to steal.
+			This is everything anyone else sees. These are the exact bytes that travel to the DON and pass
+			through every node operator on the way. No key rides along with them, so there is nothing here
+			to read and nothing here to steal.
 		</p>
 
 		{ciphertext ? (
 			<>
-				<div className="cipher" aria-label="sealed exploit ciphertext">
-					{ciphertext}
+				<div className="pantograph-wrap">
+					<div className="pantograph" aria-label="sealed exploit ciphertext">
+						{ciphertext}
+					</div>
+					<span className="overprint">Sealed</span>
 				</div>
+
 				{envelope && (
 					<>
-						<div className="cipher-meta">
-							<span className="m">
-								total <b>{envelope.totalBytes} bytes</b>
-							</span>
-							<span className="m">
-								scheme <b>X25519 · HKDF-SHA256 · XChaCha20-Poly1305</b>
-							</span>
-							<span className="m">
-								version <b>0x0{envelope.version}</b>
-							</span>
-						</div>
+						<dl className="cipher-meta">
+							<div className="m">
+								<dt>on the wire</dt>
+								<dd>{envelope.totalBytes} bytes</dd>
+							</div>
+							<div className="m">
+								<dt>scheme</dt>
+								<dd>X25519 · HKDF-SHA256 · XChaCha20-Poly1305</dd>
+							</div>
+							<div className="m">
+								<dt>envelope version</dt>
+								<dd>0x0{envelope.version}</dd>
+							</div>
+						</dl>
+
 						<div className="envelope">
 							<div className="env-row">
 								<span className="en-name">ephemeral pubkey</span>
@@ -42,14 +54,14 @@ export const WireZone = ({ ciphertext, envelope }: Props) => (
 								</span>
 							</div>
 							<div className="env-row">
-								<span className="en-name">nonce (24B)</span>
+								<span className="en-name">nonce · 24 bytes</span>
 								<span className="en-val" title={envelope.nonce}>
 									{truncateHash(envelope.nonce, 20, 12)}
 								</span>
 							</div>
 							<div className="env-row">
 								<span className="en-name">ciphertext</span>
-								<span className="en-val">{envelope.ciphertext.length / 2 - 1} bytes (opaque)</span>
+								<span className="en-val">{envelope.ciphertext.length / 2 - 1} bytes, opaque</span>
 							</div>
 							<div className="env-row">
 								<span className="en-name">poly1305 tag</span>
@@ -60,13 +72,21 @@ export const WireZone = ({ ciphertext, envelope }: Props) => (
 						</div>
 					</>
 				)}
+
 				<div className="readback">
-					<b>Read attempt outside the enclave:</b> 🔒 decryption requires the enclave-held X25519
-					private key. Operators can relay these bytes but can never open them.
+					<Icon name="eyeOff" size={17} className="mark" />
+					<span>
+						<b>Try to read it from out here and you get exactly this.</b> Opening the envelope needs
+						the X25519 private key, and that key never leaves the enclave. Operators can relay these
+						bytes all day; they cannot open them.
+					</span>
 				</div>
 			</>
 		) : (
-			<div className="empty">Submit an exploit to see the sealed bytes that go over the wire.</div>
+			<div className="empty">
+				<Icon name="lock" size={26} className="empty-mark" strokeWidth={1.2} />
+				Submit an exploit above and the sealed bytes will appear here.
+			</div>
 		)}
 	</section>
 )

@@ -1,17 +1,21 @@
 {
-	"cSpell.words": [
-		"chacha",
-		"devlog",
-		"errbox",
-		"keypair",
-		"lede",
-		"PRIVKEY",
-		"readback",
-		"vfield",
-		"VITE",
-		"vlabel",
-		"vsecond",
-		"vvalue",
-		"xchacha"
-	]
+  "cSpell.words": [
+    "chacha",
+    "chainid",
+    "devlog",
+    "errbox",
+    "hypotrochoid",
+    "keypair",
+    "lede",
+    "PRIVKEY",
+    "readback",
+    "timelocked",
+    "TYPEHASH",
+    "vfield",
+    "VITE",
+    "vlabel",
+    "vsecond",
+    "vvalue",
+    "xchacha"
+  ]
 }

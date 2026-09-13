@@ -26,6 +26,13 @@ export const withThousands = (num: string): string => {
 
 export const formatEth = (wei: string): string => `${withThousands(weiToEth(wei))} ETH`
 
+export const ethAmount = (wei: string): string => withThousands(weiToEth(wei))
+
+export const serialOf = (programId: string, target: string): string => {
+	const body = (target.startsWith('0x') ? target.slice(2) : target).toUpperCase()
+	return `UL-${programId.padStart(4, '0')}-${body.slice(0, 4)}`
+}
+
 export const truncateHash = (hash: string, head = 10, tail = 8): string => {
 	if (!hash) return ''
 	if (hash.length <= head + tail + 1) return hash
@@ -35,7 +42,7 @@ export const truncateHash = (hash: string, head = 10, tail = 8): string => {
 export interface SeverityMeta {
 	label: Severity
 	color: string
-	glow: string
+	wash: string
 	blurb: string
 }
 
@@ -44,27 +51,37 @@ export const severityMeta = (severity: Severity): SeverityMeta => {
 		case 'CRITICAL':
 			return {
 				label: 'CRITICAL',
-				color: '#ff4d4f',
-				glow: 'rgba(255,77,79,0.45)',
-				blurb: 'Catastrophic drain',
+				color: '#9b2233',
+				wash: 'rgba(155,34,51,0.055)',
+				blurb: 'The vault can be emptied.',
 			}
 		case 'HIGH':
-			return { label: 'HIGH', color: '#ff9f43', glow: 'rgba(255,159,67,0.4)', blurb: 'Major loss' }
+			return {
+				label: 'HIGH',
+				color: '#a4521a',
+				wash: 'rgba(164,82,26,0.055)',
+				blurb: 'A major share of the vault is reachable.',
+			}
 		case 'MEDIUM':
 			return {
 				label: 'MEDIUM',
-				color: '#ffd43b',
-				glow: 'rgba(255,212,59,0.35)',
-				blurb: 'Meaningful loss',
+				color: '#7a5a14',
+				wash: 'rgba(122,90,20,0.055)',
+				blurb: 'A meaningful loss, short of the whole vault.',
 			}
 		case 'LOW':
-			return { label: 'LOW', color: '#38d9a9', glow: 'rgba(56,217,169,0.3)', blurb: 'Minor loss' }
+			return {
+				label: 'LOW',
+				color: '#1d5b3f',
+				wash: 'rgba(29,91,63,0.055)',
+				blurb: 'A minor loss the vault can absorb.',
+			}
 		default:
 			return {
 				label: 'NONE',
-				color: '#8b949e',
-				glow: 'rgba(139,148,158,0.25)',
-				blurb: 'No drain detected',
+				color: '#5d6b62',
+				wash: 'transparent',
+				blurb: 'The replay moved nothing. Nothing to reward.',
 			}
 	}
 }

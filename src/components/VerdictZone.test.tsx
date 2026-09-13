@@ -19,7 +19,7 @@ describe('VerdictZone', () => {
 		const sev = container.querySelector('.sev') as HTMLElement
 		expect(sev).toBeTruthy()
 		expect(sev.getAttribute('data-severity')).toBe('CRITICAL')
-		expect(sev.style.getPropertyValue('--sev-color')).toBe('#ff4d4f')
+		expect(sev.style.getPropertyValue('--sev-color')).toBe('#9b2233')
 	})
 
 	it('formats the loss from wei to grouped ETH', () => {
@@ -40,7 +40,7 @@ describe('VerdictZone', () => {
 		const none: Verdict = { ...CRITICAL, severity: 'NONE', lossAmount: '0' }
 		const { container } = render(<VerdictZone verdict={none} source="test" />)
 		const sev = container.querySelector('.sev') as HTMLElement
-		expect(sev.style.getPropertyValue('--sev-color')).toBe('#8b949e')
+		expect(sev.style.getPropertyValue('--sev-color')).toBe('#5d6b62')
 		const lossValue = container.querySelector('.vfield .vvalue') as HTMLElement
 		expect(lossValue.textContent).toBe('0 ETH')
 	})

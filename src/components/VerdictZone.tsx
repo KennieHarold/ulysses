@@ -1,6 +1,9 @@
 import { useState, type CSSProperties } from 'react'
 import { formatEth, severityMeta, truncateHash, weiToEth } from '../lib/format'
 import type { Verdict } from '../lib/verdict'
+import { Rosette } from './Guilloche'
+import { Icon } from './Icon'
+import { markOf } from '../lib/pipeline'
 
 const CopyButton = ({ value }: { value: string }) => {
 	const [copied, setCopied] = useState(false)
@@ -14,8 +17,13 @@ const CopyButton = ({ value }: { value: string }) => {
 		}
 	}
 	return (
-		<button className={`copy${copied ? ' copied' : ''}`} onClick={copy} aria-label="copy full hash">
-			{copied ? '✓ copied' : 'copy'}
+		<button
+			className={`copy${copied ? ' copied' : ''}`}
+			onClick={copy}
+			aria-label="copy full hash"
+		>
+			<Icon name={copied ? 'check' : 'copy'} size={11} strokeWidth={1.8} />
+			{copied ? 'copied' : 'copy'}
 		</button>
 	)
 }
@@ -23,54 +31,69 @@ const CopyButton = ({ value }: { value: string }) => {
 export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; source: string }) => {
 	if (!verdict) {
 		return (
-			<section className="zone verdict" aria-labelledby="verdict-h">
-				<span className="zone-num">03 / verdict</span>
-				<h2 id="verdict-h">Verdict</h2>
-				<p className="sub">The only value the enclave lets back out.</p>
-				<div className="empty">Awaiting the verdict from the enclave…</div>
+			<section className="clause" aria-labelledby="verdict-h">
+				<div className="clause-head">
+					<span className="clause-mark">{markOf('Verdict')}</span>
+					<h2 id="verdict-h">Verdict</h2>
+				</div>
+				<p className="sub">The one and only value the enclave lets back out.</p>
+				<div className="empty">
+					<Icon name="seal" size={26} className="empty-mark" strokeWidth={1.2} />
+					No verdict issued yet.
+				</div>
 			</section>
 		)
 	}
 
 	const meta = severityMeta(verdict.severity)
+	const voided = Boolean(verdict.error)
 	const sevStyle = {
-		'--sev-color': meta.color,
-		'--sev-glow': meta.glow,
+		'--sev-color': voided ? '#5d6b62' : meta.color,
+		'--sev-wash': voided ? 'transparent' : meta.wash,
 	} as CSSProperties
 
 	return (
-		<section className="zone verdict" aria-labelledby="verdict-h">
-			<span className="zone-num">03 / verdict</span>
-			<h2 id="verdict-h">Verdict</h2>
+		<section className="clause" aria-labelledby="verdict-h">
+			<div className="clause-head">
+				<span className="clause-mark">{markOf('Verdict')}</span>
+				<h2 id="verdict-h">Verdict</h2>
+			</div>
 			<p className="sub">
-				The only value the enclave lets back out, computed on the decrypted exploit.
+				The one and only value the enclave lets back out, measured on the decrypted exploit and
+				signed inside the box.
 			</p>
 
 			<div className="verdict-card">
-				<div className="sev" style={sevStyle} data-severity={verdict.severity}>
-					<span className="ring" aria-hidden />
+				<div
+					className={`sev${voided ? ' voided' : ''}`}
+					style={sevStyle}
+					data-severity={verdict.severity}
+				>
+					<span className="ring">
+						<Rosette seed={verdict.exploitHash} size={104} strokeWidth={0.55} />
+					</span>
 					<div className="sev-text">
 						<div className="lbl">{meta.label}</div>
 						<div className="desc">{meta.blurb}</div>
 					</div>
+					<span className="sev-stamp">
+						{voided
+							? 'Void · simulation failed'
+							: verdict.signature
+								? 'Signed · bearer voucher'
+								: 'Unsigned'}
+					</span>
 				</div>
 
 				{verdict.error && (
-					<div
-						className="verdict-error"
-						role="alert"
-						style={{
-							margin: '0 0 14px',
-							padding: '10px 12px',
-							borderRadius: 8,
-							border: '1px solid var(--warn, #b8860b)',
-							background: 'rgba(184, 134, 11, 0.08)',
-							fontSize: 13,
-							lineHeight: 1.4,
-						}}
-					>
-						<b>Simulation unavailable.</b> The verdict below is not a confirmed result; the enclave
-						could not run the simulation: {verdict.error}
+					<div className="verdict-warn" role="alert">
+						<Icon name="alert" size={17} className="mark" />
+						<span>
+							<b>The simulation could not be run, so this verdict is void.</b> Nothing below is a
+							confirmed result and no reward was signed. Submit the exploit again once the
+							simulation backend is reachable.
+							<span className="detail">{verdict.error}</span>
+						</span>
 					</div>
 				)}
 
@@ -88,32 +111,33 @@ export const VerdictZone = ({ verdict, source }: { verdict: Verdict | null; sour
 						</div>
 					</div>
 					{verdict.target && (
-						<div className="vfield" style={{ gridColumn: '1 / -1' }}>
+						<div className="vfield wide">
 							<div className="vlabel">target contract</div>
 							<div className="vvalue hash-value">
 								<span title={verdict.target}>{truncateHash(verdict.target, 14, 12)}</span>
 							</div>
-							<div className="vsecond">the address the decrypted exploit was simulated against</div>
+							<div className="vsecond">the address the decrypted exploit was replayed against</div>
 						</div>
 					)}
-					<div className="vfield" style={{ gridColumn: '1 / -1' }}>
+					<div className="vfield wide">
 						<div className="vlabel">exploit hash · keccak256(calldata)</div>
 						<div className="vvalue hash-value">
 							<span title={verdict.exploitHash}>{truncateHash(verdict.exploitHash, 14, 12)}</span>
 							<CopyButton value={verdict.exploitHash} />
 						</div>
-						<div className="vsecond">commits to the exact exploit without revealing it</div>
+						<div className="vsecond">
+							Commits to this exact exploit without revealing a byte of it, and seeds the rosette
+							above, so no two verdicts carry the same seal.
+						</div>
 					</div>
 				</div>
 
 				<div className="verdict-caption">
-					<span className="lock" aria-hidden>
-						🔐
-					</span>
+					<Icon name="seal" size={17} className="mark" />
 					<span>
-						Computed inside the TEE; the exploit was never read outside it. Loss{' '}
-						<b>{weiToEth(verdict.lossAmount)} ETH</b> measured by replaying the decrypted calldata
-						on a fork. <span style={{ color: 'var(--muted-2)' }}>verdict source: {source}</span>
+						Computed inside the TEE, on calldata that was never read outside it. The{' '}
+						<b>{weiToEth(verdict.lossAmount)} ETH</b> loss was measured by replaying the decrypted
+						exploit against a fork. <span className="src">Source: {source}.</span>
 					</span>
 				</div>
 			</div>
