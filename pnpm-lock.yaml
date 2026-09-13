@@ -17,6 +17,9 @@ importers:
       react-router-dom:
         specifier: ^7.18.3
         version: 7.18.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      viem:
+        specifier: 2.34.0
+        version: 2.34.0(typescript@5.9.3)
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.5
@@ -72,9 +75,6 @@ importers:
       typescript-eslint:
         specifier: ^8.70.0
         version: 8.70.0(eslint@9.39.5)(typescript@5.9.3)
-      viem:
-        specifier: 2.34.0
-        version: 2.34.0(typescript@5.9.3)
       vite:
         specifier: ^6.3.5
         version: 6.4.3(@types/node@22.20.2)
