@@ -7,7 +7,8 @@
     "test": "hardhat test",
     "compile": "hardhat compile",
     "deploy:vault:sepolia": "hardhat ignition deploy ignition/modules/VulnerableVault.ts --network sepolia",
-    "deploy:exploit:sepolia": "hardhat ignition deploy ignition/modules/Exploit.ts --network sepolia"
+    "deploy:exploit:sepolia": "hardhat ignition deploy ignition/modules/Exploit.ts --network sepolia",
+    "deploy:escrow:sepolia": "hardhat ignition deploy ignition/modules/BountyEscrow.ts --network sepolia --parameters ignition/params/escrow.sepolia.json"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
